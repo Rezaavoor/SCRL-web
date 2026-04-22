@@ -1,7 +1,8 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useEffect, useRef } from "react";
+import { useAtom, useSetAtom, useAtomValue } from "jotai";
+import { useEffect, useRef, useState } from "react";
 import { itemsAtom, selectedIdAtom, viewportAtom } from "../state/atoms";
-import { zoomAt } from "../lib/geometry";
+import { screenToWorld, zoomAt } from "../lib/geometry";
+import { createPhotoFromFile } from "../lib/photo";
 import type { Vec2 } from "../types";
 import { Photo } from "./Photo";
 import { SelectionFrame } from "./SelectionFrame";
@@ -9,9 +10,11 @@ import { SelectionFrame } from "./SelectionFrame";
 export function Canvas() {
   const [viewport, setViewport] = useAtom(viewportAtom);
   const items = useAtomValue(itemsAtom);
+  const setItems = useSetAtom(itemsAtom);
   const setSelectedId = useSetAtom(selectedIdAtom);
   const viewportRef = useRef<HTMLDivElement>(null);
   const lastPointer = useRef<Vec2 | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   useEffect(() => {
     const el = viewportRef.current;
@@ -49,6 +52,33 @@ export function Canvas() {
     lastPointer.current = null;
   };
 
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault(); // allow drop
+    setIsDragOver(true);
+  };
+
+  const onDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith("image/"),
+    );
+    const rect = viewportRef.current!.getBoundingClientRect();
+    const dropPositionWorld = screenToWorld(
+      { x: e.clientX - rect.left, y: e.clientY - rect.top },
+      viewport,
+    );
+    const photos = await Promise.all(
+      files.map((file, i) =>
+        createPhotoFromFile(file, {
+          x: dropPositionWorld.x + i * 5,
+          y: dropPositionWorld.y + i * 5,
+        }),
+      ),
+    );
+    setItems((prev) => [...prev, ...photos]);
+  };
+
   return (
     <div
       ref={viewportRef}
@@ -56,6 +86,9 @@ export function Canvas() {
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
+      onDragOver={onDragOver}
+      onDragLeave={() => setIsDragOver(false)}
+      onDrop={onDrop}
       style={{
         backgroundImage:
           "radial-gradient(circle, #d1d5db 1px, transparent 1px)",
@@ -75,6 +108,13 @@ export function Canvas() {
         ))}
         <SelectionFrame />
       </div>
+      {isDragOver && (
+        <div className="pointer-events-none absolute inset-4 rounded-2xl border-2 border-dashed border-blue-500 bg-blue-500/10 flex items-center justify-center">
+          <span className="text-blue-700 font-medium text-sm bg-white/80 px-3 py-1.5 rounded-full shadow">
+            Drop image to add to canvas
+          </span>
+        </div>
+      )}
     </div>
   );
 }
