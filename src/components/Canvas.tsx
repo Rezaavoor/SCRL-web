@@ -1,41 +1,52 @@
 import { useAtom } from "jotai";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { viewportAtom } from "../state/atoms";
-
-type DragStart = { x: number; y: number; panX: number; panY: number };
+import { zoomAt } from "../lib/geometry";
+import type { Vec2 } from "../types";
 
 export function Canvas() {
   const [viewport, setViewport] = useAtom(viewportAtom);
-  const dragStart = useRef<DragStart | null>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const lastPointer = useRef<Vec2 | null>(null);
+
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault(); // no default behaviour
+
+      const rect = el.getBoundingClientRect(); // Position and size of the viewport on the page.
+      const cursor = { x: e.clientX - rect.left, y: e.clientY - rect.top }; // convert cursor to viewport-local coordinates
+      const factor = Math.exp(-e.deltaY * 0.0015); // zoom factor based on the wheel delta
+      setViewport((v) => zoomAt(v, cursor, v.zoom * factor)); // apply the new zoom
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [setViewport]);
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.target !== e.currentTarget) return;
     e.currentTarget.setPointerCapture(e.pointerId);
-    dragStart.current = {
-      x: e.clientX,
-      y: e.clientY,
-      panX: viewport.panX,
-      panY: viewport.panY,
-    };
+    lastPointer.current = { x: e.clientX, y: e.clientY };
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!dragStart.current) return;
-    const { x, y, panX, panY } = dragStart.current;
-    setViewport((v) => ({
-      ...v,
-      panX: panX + (e.clientX - x),
-      panY: panY + (e.clientY - y),
-    }));
+    if (!lastPointer.current) return;
+    const dx = e.clientX - lastPointer.current.x;
+    const dy = e.clientY - lastPointer.current.y;
+    lastPointer.current = { x: e.clientX, y: e.clientY };
+    setViewport((v) => ({ ...v, panX: v.panX + dx, panY: v.panY + dy }));
   };
 
-  const onPointerUp = (e: React.PointerEvent) => {
-    dragStart.current = null;
-    e.currentTarget.releasePointerCapture(e.pointerId);
+  const onPointerUp = () => {
+    lastPointer.current = null;
   };
 
   return (
     <div
+      ref={viewportRef}
       className="absolute inset-0 overflow-hidden cursor-grab active:cursor-grabbing"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
