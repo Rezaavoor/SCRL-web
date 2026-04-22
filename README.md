@@ -64,28 +64,6 @@ src/
     ├── Toolbar.tsx         # Upload + canvas actions
     ├── Photo.tsx           # A single photo on the canvas
     ├── SelectionFrame.tsx  # Selection outline wrapper
-    ├── ResizeHandle.tsx    # Corner resize handles
+    ├── ResizeHandle.tsx    # Resize handle
     └── RotateHandle.tsx    # Rotation handle
 ```
-
-## Coordinate Model
-
-Photos are stored in **world space** (coordinates independent of zoom/pan):
-
-- `x`, `y` are the photo's **center** in world coordinates
-- `width`, `height` are the world-space dimensions
-- `rotation` is in **radians**
-
-The `Viewport` (`panX`, `panY`, `zoom`) transforms world space to screen space at render time, which keeps pan/zoom cheap and avoids mutating photo state when the camera moves.
-
-## Roadmap / Nice-to-Haves
-
-- [ ] Edge / item snapping while dragging
-- [ ] Multiple slides within the canvas
-- [ ] Drag-and-drop photo upload
-- [ ] Keyboard shortcuts (delete, duplicate, nudge)
-- [ ] Undo / redo history
-
-## License
-
-Private prototype — not licensed for public use.
