@@ -4,6 +4,7 @@ import { itemsAtom, selectedIdAtom, viewportAtom } from "../state/atoms";
 import { zoomAt } from "../lib/geometry";
 import type { Vec2 } from "../types";
 import { Photo } from "./Photo";
+import { SelectionFrame } from "./SelectionFrame";
 
 export function Canvas() {
   const [viewport, setViewport] = useAtom(viewportAtom);
@@ -72,6 +73,7 @@ export function Canvas() {
         {items.map((item) => (
           <Photo key={item.id} item={item} />
         ))}
+        <SelectionFrame />
       </div>
     </div>
   );
