@@ -5,3 +5,13 @@ export type Viewport = {
   panY: number;
   zoom: number;
 };
+
+export type PhotoItem = {
+  id: string;
+  src: string;
+  x: number; // world-space center
+  y: number;
+  width: number;
+  height: number;
+  rotation: number; // radians
+};

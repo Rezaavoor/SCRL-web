@@ -1,11 +1,13 @@
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useEffect, useRef } from "react";
-import { viewportAtom } from "../state/atoms";
+import { itemsAtom, viewportAtom } from "../state/atoms";
 import { zoomAt } from "../lib/geometry";
 import type { Vec2 } from "../types";
+import { Photo } from "./Photo";
 
 export function Canvas() {
   const [viewport, setViewport] = useAtom(viewportAtom);
+  const items = useAtomValue(itemsAtom);
   const viewportRef = useRef<HTMLDivElement>(null);
   const lastPointer = useRef<Vec2 | null>(null);
 
@@ -57,6 +59,18 @@ export function Canvas() {
         backgroundSize: `${20 * viewport.zoom}px ${20 * viewport.zoom}px`,
         backgroundPosition: `${viewport.panX}px ${viewport.panY}px`,
       }}
-    />
+    >
+      <div
+        className="absolute left-0 top-0"
+        style={{
+          transform: `translate(${viewport.panX}px, ${viewport.panY}px) scale(${viewport.zoom})`,
+          transformOrigin: "0 0",
+        }}
+      >
+        {items.map((item) => (
+          <Photo key={item.id} item={item} />
+        ))}
+      </div>
+    </div>
   );
 }
