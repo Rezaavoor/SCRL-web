@@ -1,11 +1,7 @@
-import './App.css'
-function App() {
+import { Canvas } from "./components/Canvas";
 
-  return (
-    <>
-      hello world
-    </>
-  )
+function App() {
+  return <Canvas />;
 }
 
-export default App
+export default App;
