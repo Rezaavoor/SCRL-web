@@ -2,6 +2,8 @@
 
 A simplified, desktop web version of the canvas from the [SCRL mobile apps](https://apps.apple.com/se/app/scrl-photo-collage-maker/id1289057196?l=en-GB). Built as a prototype that lets you drop photos onto an infinite, zoomable workspace and manipulate them with move / resize / rotate handles.
 
+**Live demo:** [rezaavoor.github.io/SCRL-web](https://rezaavoor.github.io/SCRL-web/)
+
 ## Features
 
 - **Scrollable & zoomable canvas** — pan with drag, zoom with scroll or trackpad pinch. Zoom is anchored to the mouse pointer.
@@ -45,7 +47,6 @@ pnpm build     # type-check and produce a production build in dist/
 pnpm preview   # serve the production build locally
 pnpm lint      # run ESLint over the repo
 ```
-
 ## Project Structure
 
 ```
@@ -65,5 +66,6 @@ src/
     ├── Photo.tsx           # A single photo on the canvas
     ├── SelectionFrame.tsx  # Selection outline wrapper
     ├── ResizeHandle.tsx    # Resize handle
-    └── RotateHandle.tsx    # Rotation handle
+    ├── RotateHandle.tsx    # Rotation handle
+    └── DeleteHandle.tsx    # Delete handle
 ```
