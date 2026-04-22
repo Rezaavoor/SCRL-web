@@ -1,6 +1,7 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useRef } from "react";
 import { itemsAtom, viewportAtom } from "../state/atoms";
+import { worldFromLocal } from "../lib/geometry";
 import type { PhotoItem } from "../types";
 
 const HANDLE_PX = 10;
@@ -14,11 +15,10 @@ export function RotateHandle({ item }: { item: PhotoItem }) {
   const snap = useRef<Snap | null>(null);
 
   const handleSize = HANDLE_PX / zoom;
-  const offsetY = -item.height / 2 - GAP_PX / zoom;
-  const sin = Math.sin(item.rotation);
-  const cos = Math.cos(item.rotation);
-  const hx = item.x - offsetY * sin;
-  const hy = item.y + offsetY * cos;
+  const { x: hx, y: hy } = worldFromLocal(item, {
+    x: 0,
+    y: -item.height / 2 - GAP_PX / zoom,
+  }); // above the top edge wrt the photo's rotation
 
   // Pointer angle around the photo's center, in client coords.
   // Assumes the viewport is at page (0,0) — true for this app's layout.

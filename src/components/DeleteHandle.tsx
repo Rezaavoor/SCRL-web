@@ -1,5 +1,6 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { itemsAtom, selectedIdAtom, viewportAtom } from "../state/atoms";
+import { worldFromLocal } from "../lib/geometry";
 import type { PhotoItem } from "../types";
 
 export function DeleteHandle({ item }: { item: PhotoItem }) {
@@ -11,12 +12,10 @@ export function DeleteHandle({ item }: { item: PhotoItem }) {
   const size = 22 / zoom;
   const gap = 10 / zoom;
 
-  const cos = Math.cos(item.rotation);
-  const sin = Math.sin(item.rotation);
-  const localX = item.width / 2 + gap;
-  const localY = -item.height / 2 - gap;
-  const hx = item.x + localX * cos - localY * sin;
-  const hy = item.y + localX * sin + localY * cos;
+  const { x: hx, y: hy } = worldFromLocal(item, {
+    x: item.width / 2 + gap,
+    y: -item.height / 2 - gap,
+  }); // just outside the top-right corner wrt the photo's rotation
 
   const onPointerDown = (e: React.PointerEvent) => {
     e.stopPropagation();

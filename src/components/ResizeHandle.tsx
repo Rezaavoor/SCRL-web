@@ -1,6 +1,7 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useRef } from "react";
 import { itemsAtom, viewportAtom } from "../state/atoms";
+import { worldFromLocal } from "../lib/geometry";
 import type { PhotoItem, Vec2 } from "../types";
 
 const HANDLE_PX = 10; // size of the handle in pixels
@@ -13,10 +14,10 @@ export function ResizeHandle({ item }: { item: PhotoItem }) {
 
   const handleSize = HANDLE_PX / zoom;
 
-  const cos = Math.cos(item.rotation);
-  const sin = Math.sin(item.rotation);
-  const hx = item.x - (item.width / 2) * cos + (item.height / 2) * sin; // top left corner wrt the photo's rotation
-  const hy = item.y - (item.width / 2) * sin - (item.height / 2) * cos; // top left corner wrt the photo's rotation
+  const { x: hx, y: hy } = worldFromLocal(item, {
+    x: -item.width / 2,
+    y: -item.height / 2,
+  }); // top left corner wrt the photo's rotation
 
   const onPointerDown = (e: React.PointerEvent) => {
     e.stopPropagation();
