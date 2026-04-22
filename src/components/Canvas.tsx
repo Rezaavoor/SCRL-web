@@ -1,6 +1,6 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useRef } from "react";
-import { itemsAtom, viewportAtom } from "../state/atoms";
+import { itemsAtom, selectedIdAtom, viewportAtom } from "../state/atoms";
 import { zoomAt } from "../lib/geometry";
 import type { Vec2 } from "../types";
 import { Photo } from "./Photo";
@@ -8,6 +8,7 @@ import { Photo } from "./Photo";
 export function Canvas() {
   const [viewport, setViewport] = useAtom(viewportAtom);
   const items = useAtomValue(itemsAtom);
+  const setSelectedId = useSetAtom(selectedIdAtom);
   const viewportRef = useRef<HTMLDivElement>(null);
   const lastPointer = useRef<Vec2 | null>(null);
 
@@ -30,6 +31,7 @@ export function Canvas() {
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.target !== e.currentTarget) return;
+    setSelectedId(null);
     e.currentTarget.setPointerCapture(e.pointerId);
     lastPointer.current = { x: e.clientX, y: e.clientY };
   };
