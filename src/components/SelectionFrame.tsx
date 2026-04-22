@@ -1,5 +1,6 @@
 import { useAtomValue } from "jotai";
 import { itemsAtom, selectedIdAtom } from "../state/atoms";
+import { DeleteHandle } from "./DeleteHandle";
 import { ResizeHandle } from "./ResizeHandle";
 import { RotateHandle } from "./RotateHandle";
 
@@ -13,6 +14,7 @@ export function SelectionFrame() {
     <>
       <ResizeHandle item={item} />
       <RotateHandle item={item} />
+      <DeleteHandle item={item} />
     </>
   );
 }
