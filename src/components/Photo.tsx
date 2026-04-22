@@ -48,7 +48,7 @@ export function Photo({ item }: { item: PhotoItem }) {
         width: item.width,
         height: item.height,
         maxWidth: "none",
-        outline: selected ? "2px solid #3b82f6" : "none",
+        outline: selected ? `${2 / zoom}px solid #3b82f6` : "none", // outline width based on the zoom
         cursor: "move",
         transform: `rotate(${item.rotation}rad)`,
         transformOrigin: "center",
