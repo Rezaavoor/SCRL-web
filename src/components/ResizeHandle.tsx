@@ -15,8 +15,8 @@ export function ResizeHandle({ item }: { item: PhotoItem }) {
 
   const cos = Math.cos(item.rotation);
   const sin = Math.sin(item.rotation);
-  const hx = item.x + (item.width / 2) * cos - (item.height / 2) * sin; // bottom right corner wrt the photo's rotation
-  const hy = item.y + (item.width / 2) * sin + (item.height / 2) * cos; // bottom right corner wrt the photo's rotation
+  const hx = item.x - (item.width / 2) * cos + (item.height / 2) * sin; // top left corner wrt the photo's rotation
+  const hy = item.y - (item.width / 2) * sin - (item.height / 2) * cos; // top left corner wrt the photo's rotation
 
   const onPointerDown = (e: React.PointerEvent) => {
     e.stopPropagation();
@@ -34,8 +34,8 @@ export function ResizeHandle({ item }: { item: PhotoItem }) {
     const s = Math.sin(startItem.rotation);
     const localDx = c * dx + s * dy;
     const localDy = -s * dx + c * dy;
-    const width = Math.max(MIN_SIZE, startItem.width + 2 * localDx); // new width based on the delta in the photo's rotation
-    const height = Math.max(MIN_SIZE, startItem.height + 2 * localDy); // new height based on the delta in the photo's rotation
+    const width = Math.max(MIN_SIZE, startItem.width - 2 * localDx); // new width based on the delta in the photo's rotation
+    const height = Math.max(MIN_SIZE, startItem.height - 2 * localDy); // new height based on the delta in the photo's rotation
     setItems((all) =>
       all.map((it) => (it.id === item.id ? { ...it, width, height } : it)),
     );
